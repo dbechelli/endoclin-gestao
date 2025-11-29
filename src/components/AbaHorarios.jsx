@@ -52,7 +52,7 @@ function AbaHorarios({ formData, updateConfig, toggleDia, adicionarPeriodo, remo
           </div>
 
           <div>
-            <label style={labelStyle}>Retorno (min)</label>
+            <label style={labelStyle}>Retorno (dias)</label>
             <input
               type="number"
               value={config.retorno_duracao}
