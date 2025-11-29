@@ -175,11 +175,18 @@ function GestaoProfissionais() {
   const salvarProfissional = async () => {
     setLoading(true)
     try {
+      let idSalvo = profissionalSelecionado
+      
       if (profissionalSelecionado === 'novo') {
-        const { error } = await db.insert('profissionais', formData)
+        const { data, error } = await db.insert('profissionais', formData)
         
         if (error) throw error
         mostrarMensagem('sucesso', 'Profissional criado com sucesso!')
+        
+        // Pega o ID do novo profissional
+        if (data && data[0]) {
+          idSalvo = data[0].id
+        }
       } else {
         const { error } = await db.update('profissionais', formData, {
           id: profissionalSelecionado
@@ -190,6 +197,11 @@ function GestaoProfissionais() {
       }
       
       await carregarProfissionais()
+      
+      // Mantém o profissional selecionado após salvar
+      if (idSalvo) {
+        setProfissionalSelecionado(idSalvo)
+      }
     } catch (error) {
       mostrarMensagem('erro', 'Erro ao salvar: ' + error.message)
     } finally {
