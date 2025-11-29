@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  backend:
+    image: endoclin-backend:latest
+    container_name: endoclin-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      # Adicione suas variáveis de ambiente aqui
+    networks:
+      - endoclin-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: endoclin-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - endoclin-network
+
+networks:
+  endoclin-network:
+    driver: bridge
