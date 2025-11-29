@@ -648,6 +648,7 @@ function GestaoProfissionais() {
         <div style={{ padding: '25px' }}>
           {abaAtiva === 'horarios' && (
             <AbaHorarios
+              key={`horarios-${profissionalSelecionado}`}
               formData={formData}
               updateConfig={updateConfig}
               toggleDia={toggleDia}
@@ -659,6 +660,7 @@ function GestaoProfissionais() {
 
           {abaAtiva === 'competencias' && (
             <AbaCompetencias
+              key={`competencias-${profissionalSelecionado}`}
               config={formData.config_atendimento}
               adicionarItem={adicionarItem}
               removerItem={removerItem}
@@ -667,6 +669,7 @@ function GestaoProfissionais() {
 
           {abaAtiva === 'restricoes' && (
             <AbaRestricoes
+              key={`restricoes-${profissionalSelecionado}`}
               config={formData.config_atendimento}
               updateConfig={updateConfig}
               adicionarItem={adicionarItem}
@@ -676,6 +679,7 @@ function GestaoProfissionais() {
 
           {abaAtiva === 'convenios' && (
             <AbaConvenios
+              key={`convenios-${profissionalSelecionado}`}
               config={formData.config_atendimento}
               updateConfig={updateConfig}
               adicionarItem={adicionarItem}
@@ -685,6 +689,7 @@ function GestaoProfissionais() {
 
           {abaAtiva === 'perfil_ia' && (
             <AbaPerfilIA
+              key={`perfil_ia-${profissionalSelecionado}`}
               config={formData.config_atendimento}
               updateConfig={updateConfig}
               adicionarItem={adicionarItem}
@@ -694,6 +699,7 @@ function GestaoProfissionais() {
 
           {abaAtiva === 'comunicacao' && (
             <AbaComunicacao
+              key={`comunicacao-${profissionalSelecionado}`}
               config={formData.config_atendimento}
               updateConfig={updateConfig}
             />
