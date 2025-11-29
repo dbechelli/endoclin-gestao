@@ -1,0 +1,20 @@
+types {
+    text/html html;
+    text/css css;
+    text/plain txt;
+    text/javascript js mjs;
+    application/javascript js mjs;
+    application/json json;
+    image/svg+xml svg;
+    image/png png;
+    image/jpeg jpg jpeg;
+    image/gif gif;
+    image/x-icon ico;
+    image/webp webp;
+    font/woff woff;
+    font/woff2 woff2;
+    font/ttf ttf;
+    font/otf otf;
+    video/mp4 mp4;
+    video/webm webm;
+}
