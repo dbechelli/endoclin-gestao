@@ -64,10 +64,10 @@ function GestaoProfissionais() {
       
       // Convênios
       formas_atendimento: {
-        aceita_particular: true,
+        aceita_particular: false,
         valor_consulta_particular: 0,
         valor_primeira_consulta: 0,
-        aceita_convenios: true,
+        aceita_convenios: false,
         convenios_atendidos: [],
         aceita_online: false
       },
@@ -84,7 +84,7 @@ function GestaoProfissionais() {
       
       // Comunicação
       comunicacao: {
-        aceita_contato_whatsapp: true,
+        aceita_contato_whatsapp: false,
         tempo_resposta_medio: '',
         disponivel_urgencias: false,
         plantao_fim_semana: false
@@ -95,6 +95,13 @@ function GestaoProfissionais() {
   useEffect(() => {
     carregarProfissionais()
   }, [])
+
+  useEffect(() => {
+    // Quando cria novo profissional, sempre volta para aba horarios
+    if (profissionalSelecionado === 'novo') {
+      setAbaAtiva('horarios')
+    }
+  }, [profissionalSelecionado])
 
   const carregarProfissionais = async () => {
     try {
@@ -147,10 +154,10 @@ function GestaoProfissionais() {
           condicoes_especiais: []
         },
         formas_atendimento: {
-          aceita_particular: true,
+          aceita_particular: false,
           valor_consulta_particular: 0,
           valor_primeira_consulta: 0,
-          aceita_convenios: true,
+          aceita_convenios: false,
           convenios_atendidos: [],
           aceita_online: false
         },
@@ -163,7 +170,7 @@ function GestaoProfissionais() {
           indicado_para: []
         },
         comunicacao: {
-          aceita_contato_whatsapp: true,
+          aceita_contato_whatsapp: false,
           tempo_resposta_medio: '',
           disponivel_urgencias: false,
           plantao_fim_semana: false
