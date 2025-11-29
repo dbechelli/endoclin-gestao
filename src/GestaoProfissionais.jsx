@@ -41,12 +41,12 @@ function GestaoProfissionais() {
     config_atendimento: {
       // Horários
       horarios: {},
-      duracao_consulta: 30,
-      primeira_consulta_duracao: 60,
-      retorno_duracao: 30,
-      intervalo_entre_consultas: 10,
-      max_consultas_dia: 12,
-      aceita_encaixe: true,
+      duracao_consulta: 0,
+      primeira_consulta_duracao: 0,
+      retorno_duracao: 0,
+      intervalo_entre_consultas: 0,
+      max_consultas_dia: 0,
+      aceita_encaixe: false,
       almoco: { inicio: '', fim: '' },
       
       // Competências
@@ -137,12 +137,12 @@ function GestaoProfissionais() {
       ativo: true,
       config_atendimento: {
         horarios: {},
-        duracao_consulta: 30,
-        primeira_consulta_duracao: 60,
-        retorno_duracao: 30,
-        intervalo_entre_consultas: 10,
-        max_consultas_dia: 12,
-        aceita_encaixe: true,
+        duracao_consulta: 0,
+        primeira_consulta_duracao: 0,
+        retorno_duracao: 0,
+        intervalo_entre_consultas: 0,
+        max_consultas_dia: 0,
+        aceita_encaixe: false,
         almoco: { inicio: '', fim: '' },
         especialidades: [],
         procedimentos_que_realiza: [],
