@@ -119,6 +119,7 @@ function GestaoProfissionais() {
 
   const novoProfissional = () => {
     setProfissionalSelecionado('novo')
+    setAbaAtiva('horarios')
     setFormData({
       nome_completo: '',
       nome_exibicao: '',
@@ -127,7 +128,47 @@ function GestaoProfissionais() {
       email: '',
       telefone: '',
       ativo: true,
-      config_atendimento: formData.config_atendimento
+      config_atendimento: {
+        horarios: {},
+        duracao_consulta: 30,
+        primeira_consulta_duracao: 60,
+        retorno_duracao: 30,
+        intervalo_entre_consultas: 10,
+        max_consultas_dia: 12,
+        aceita_encaixe: true,
+        almoco: { inicio: '', fim: '' },
+        especialidades: [],
+        procedimentos_que_realiza: [],
+        procedimentos_que_nao_realiza: [],
+        restricoes: {
+          idade_minima: null,
+          idade_maxima: null,
+          nao_atende: [],
+          condicoes_especiais: []
+        },
+        formas_atendimento: {
+          aceita_particular: true,
+          valor_consulta_particular: 0,
+          valor_primeira_consulta: 0,
+          aceita_convenios: true,
+          convenios_atendidos: [],
+          aceita_online: false
+        },
+        perfil_ia: {
+          bio: '',
+          formacao: [],
+          areas_expertise: [],
+          idiomas: [],
+          diferenciais: [],
+          indicado_para: []
+        },
+        comunicacao: {
+          aceita_contato_whatsapp: true,
+          tempo_resposta_medio: '',
+          disponivel_urgencias: false,
+          plantao_fim_semana: false
+        }
+      }
     })
   }
 
@@ -149,7 +190,6 @@ function GestaoProfissionais() {
       }
       
       await carregarProfissionais()
-      setProfissionalSelecionado(null)
     } catch (error) {
       mostrarMensagem('erro', 'Erro ao salvar: ' + error.message)
     } finally {
