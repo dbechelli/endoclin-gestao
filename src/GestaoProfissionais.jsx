@@ -2,14 +2,14 @@ import { useState, useEffect } from 'react'
 import { db } from './lib/db'
 import { 
   User, Clock, Stethoscope, XCircle, CreditCard, 
-  Brain, MessageSquare, Save, Plus, Trash2, AlertCircle, AlertTriangle, X
+  Brain, MessageSquare, Save, Plus, Trash2, AlertCircle, AlertTriangle, X, DollarSign
 } from 'lucide-react'
 import AbaHorarios from './components/AbaHorarios'
 import AbaCompetencias from './components/AbaCompetencias'
 import AbaRestricoes from './components/AbaRestricoes'
-import AbaConvenios from './components/AbaConvenios'
 import AbaPerfilIA from './components/AbaPerfilIA'
 import AbaComunicacao from './components/AbaComunicacao'
+import AbaPagamentos from './components/AbaPagamentos'
 
 const diasSemana = [
   { key: 'segunda', label: 'Segunda-feira' },
@@ -35,6 +35,7 @@ function GestaoProfissionais() {
     nome_exibicao: '',
     especialidade: '',
     crm_registro: '',
+    rqe_registro: '',
     email: '',
     telefone: '',
     ativo: true,
@@ -62,15 +63,8 @@ function GestaoProfissionais() {
         condicoes_especiais: []
       },
       
-      // Convênios
-      formas_atendimento: {
-        aceita_particular: false,
-        valor_consulta_particular: 0,
-        valor_primeira_consulta: 0,
-        aceita_convenios: false,
-        convenios_atendidos: [],
-        aceita_online: false
-      },
+      // Pagamentos (Novo)
+      tipos_atendimento: [],
       
       // Perfil IA
       perfil_ia: {
@@ -379,10 +373,10 @@ function GestaoProfissionais() {
                 <User size={24} color="#1f93ff" />
                 <div>
                   <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#2d3748' }}>
-                    {prof.nome_exibicao}
+                    {prof.nome_exibicao} <span style={{fontWeight: 'normal', fontSize: '14px', color: '#718096'}}>({prof.especialidade})</span>
                   </h3>
                   <p style={{ fontSize: '13px', color: '#718096' }}>
-                    {prof.especialidade}
+                    {prof.crm_registro} {prof.rqe_registro && `| ${prof.rqe_registro}`}
                   </p>
                 </div>
               </div>
@@ -565,6 +559,17 @@ function GestaoProfissionais() {
           </div>
 
           <div>
+            <label style={labelStyle}>RQE</label>
+            <input
+              type="text"
+              value={formData.rqe_registro}
+              onChange={(e) => setFormData({ ...formData, rqe_registro: e.target.value })}
+              style={inputStyle}
+              placeholder="12345"
+            />
+          </div>
+
+          <div>
             <label style={labelStyle}>Email</label>
             <input
               type="email"
@@ -617,7 +622,7 @@ function GestaoProfissionais() {
             { id: 'horarios', label: 'Horários', icon: Clock },
             { id: 'competencias', label: 'Competências', icon: Stethoscope },
             { id: 'restricoes', label: 'Restrições', icon: XCircle },
-            { id: 'convenios', label: 'Convênios', icon: CreditCard },
+            { id: 'pagamentos', label: 'Pagamentos', icon: DollarSign },
             { id: 'perfil_ia', label: 'Perfil IA', icon: Brain },
             { id: 'comunicacao', label: 'Comunicação', icon: MessageSquare }
           ].map(aba => {
@@ -684,13 +689,11 @@ function GestaoProfissionais() {
             />
           )}
 
-          {abaAtiva === 'convenios' && (
-            <AbaConvenios
-              key={`convenios-${profissionalSelecionado}`}
+          {abaAtiva === 'pagamentos' && (
+            <AbaPagamentos 
+              key={`pagamentos-${profissionalSelecionado}`}
               config={formData.config_atendimento}
               updateConfig={updateConfig}
-              adicionarItem={adicionarItem}
-              removerItem={removerItem}
             />
           )}
 
