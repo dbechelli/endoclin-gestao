@@ -35,7 +35,7 @@ function GestaoProfissionais() {
     nome_exibicao: '',
     especialidade: '',
     crm_registro: '',
-    rqe_registro: '',
+    rqe: '',
     email: '',
     telefone: '',
     ativo: true,
@@ -126,6 +126,7 @@ function GestaoProfissionais() {
       nome_exibicao: '',
       especialidade: '',
       crm_registro: '',
+      rqe: '',
       email: '',
       telefone: '',
       ativo: true,
@@ -376,7 +377,7 @@ function GestaoProfissionais() {
                     {prof.nome_exibicao} <span style={{fontWeight: 'normal', fontSize: '14px', color: '#718096'}}>({prof.especialidade})</span>
                   </h3>
                   <p style={{ fontSize: '13px', color: '#718096' }}>
-                    {prof.crm_registro} {prof.rqe_registro && `| ${prof.rqe_registro}`}
+                    {prof.crm_registro} {prof.rqe && `| ${prof.rqe}`}
                   </p>
                 </div>
               </div>
@@ -562,8 +563,8 @@ function GestaoProfissionais() {
             <label style={labelStyle}>RQE</label>
             <input
               type="text"
-              value={formData.rqe_registro}
-              onChange={(e) => setFormData({ ...formData, rqe_registro: e.target.value })}
+              value={formData.rqe}
+              onChange={(e) => setFormData({ ...formData, rqe: e.target.value })}
               style={inputStyle}
               placeholder="12345"
             />
