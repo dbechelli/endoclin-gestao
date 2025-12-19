@@ -1,473 +1,192 @@
-import React, { useState } from 'react';
+import { Plus, Trash2 } from 'lucide-react';
 
-const FORMAS = [
-  { id: 'pix', nome: 'PIX', icone: '💠' },
-  { id: 'credito', nome: 'Crédito', icone: '💳' },
-  { id: 'debito', nome: 'Débito', icone: '💳' },
-  { id: 'dinheiro', nome: 'Dinheiro', icone: '💵' },
-  { id: 'guia', nome: 'Guia Convênio', icone: '📋' }
-];
+function AbaPagamentos({ config, updateConfig }) {
+  const tiposDeAtendimento = [
+    'Particular',
+    'Convênio',
+    'Telemedicina'
+  ];
 
-const TIPOS = [
-  { id: 'particular', nome: 'Particular', cor: '#10b981' },
-  { id: 'convenio', nome: 'Convênio', cor: '#3b82f6' },
-  { id: 'telemedicina', nome: 'Telemedicina', cor: '#8b5cf6' }
-];
-
-export default function AbaPagamentos({ config, updateConfig }) {
-  const tipos = config?.tipos_atendimento || [];
-  
-  const [form, setForm] = useState({
-    tipo: '',
-    nome: '',
-    consulta: '',
-    primeira: '',
-    retorno: '',
-    acompanhamento: '',
-    dias_retorno: '',
-    formas: [],
-    codigo: ''
-  });
-  const [editando, setEditando] = useState(null);
-  
-  const resetForm = () => {
-    setForm({ tipo: '', nome: '', consulta: '', primeira: '', retorno: '', acompanhamento: '', dias_retorno: '', formas: [], codigo: '' });
-    setEditando(null);
+  const handleAddTipo = () => {
+    const newTipos = [...(config.tipos_atendimento || []), { tipo: 'Particular', procedimento: '', valor: 0 }];
+    updateConfig('tipos_atendimento', newTipos);
   };
-  
-  const toggleForma = (formaId) => {
-    setForm(prev => ({
-      ...prev,
-      formas: prev.formas.includes(formaId) 
-        ? prev.formas.filter(f => f !== formaId)
-        : [...prev.formas, formaId]
-    }));
+
+  const handleRemoveTipo = (index) => {
+    const newTipos = config.tipos_atendimento.filter((_, i) => i !== index);
+    updateConfig('tipos_atendimento', newTipos);
   };
-  
-  const adicionar = () => {
-    if (!form.tipo) return alert('Selecione o tipo de atendimento');
-    if (form.tipo === 'convenio' && !form.nome) return alert('Digite o nome do convênio');
-    if (form.formas.length === 0) return alert('Selecione ao menos uma forma de pagamento');
+
+  const handleUpdateTipo = (index, field, value) => {
+    const newTipos = [...config.tipos_atendimento];
     
-    const tipoInfo = TIPOS.find(t => t.id === form.tipo);
-    const novo = {
-      id: editando || Date.now(),
-      tipo: form.tipo,
-      tipoNome: tipoInfo.nome,
-      cor: tipoInfo.cor,
-      nome: form.tipo === 'convenio' ? form.nome : tipoInfo.nome,
-      consulta: Number(form.consulta) || 0,
-      primeira: Number(form.primeira) || 0,
-      retorno: Number(form.retorno) || 0,
-      acompanhamento: Number(form.acompanhamento) || 0,
-      dias_retorno: Number(form.dias_retorno) || 0,
-      formas: [...form.formas],
-      codigo: form.codigo,
-      ativo: true
-    };
-    
-    if (editando) {
-      updateConfig('tipos_atendimento', tipos.map(t => t.id === editando ? novo : t));
+    if (field === 'valor') {
+      const numericValue = value.replace(/[^0-9,.]/g, '');
+      newTipos[index][field] = numericValue;
     } else {
-      updateConfig('tipos_atendimento', [...tipos, novo]);
+      newTipos[index][field] = value;
     }
-    resetForm();
+    
+    updateConfig('tipos_atendimento', newTipos);
   };
-  
-  const editar = (item) => {
-    setForm({
-      tipo: item.tipo,
-      nome: item.tipo === 'convenio' ? item.nome : '',
-      consulta: item.consulta || '',
-      primeira: item.primeira || '',
-      retorno: item.retorno || '',
-      acompanhamento: item.acompanhamento || '',
-      dias_retorno: item.dias_retorno || '',
-      formas: [...item.formas],
-      codigo: item.codigo || ''
-    });
-    setEditando(item.id);
-  };
-  
-  const remover = (id) => {
-    if (confirm('Deseja remover este tipo de atendimento?')) {
-      updateConfig('tipos_atendimento', tipos.filter(t => t.id !== id));
+
+  const formatCurrency = (value) => {
+    if (typeof value === 'number') {
+      return value.toFixed(2).replace('.', ',');
     }
+    return value || '';
   };
-  
-  const toggleAtivo = (id) => {
-    updateConfig('tipos_atendimento', tipos.map(t => t.id === id ? {...t, ativo: !t.ativo} : t));
+
+  const parseCurrency = (value) => {
+    if (!value) return 0;
+    return parseFloat(value.replace('.', '').replace(',', '.'));
   };
-  
-  const inputStyle = {
-    width: '100%',
-    padding: '10px 12px',
-    border: '2px solid #e2e8f0',
-    borderRadius: '8px',
-    fontSize: '14px',
-    outline: 'none',
-    transition: 'border-color 0.2s'
-  };
-  
-  const labelStyle = {
-    display: 'block',
-    fontSize: '12px',
-    fontWeight: '600',
-    color: '#64748b',
-    marginBottom: '6px',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px'
-  };
-  
+
   return (
-    <div style={{maxWidth: 1000, margin: '0 auto'}}>
-      {/* Header */}
-      <div style={{marginBottom: 24}}>
-        <h1 style={{fontSize: 24, fontWeight: 700, color: '#1e293b', marginBottom: 4}}>
-          💳 Tipos de Atendimento e Pagamentos
-        </h1>
-        <p style={{fontSize: 14, color: '#64748b'}}>
-          Configure os tipos de atendimento, valores e formas de pagamento aceitas
-        </p>
-      </div>
-      
-      {/* Formulário de Adição */}
-      <div style={{background: 'white', borderRadius: 16, padding: 24, marginBottom: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0'}}>
-        <div style={{display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20}}>
-          <span style={{fontSize: 18}}>➕</span>
-          <h2 style={{fontSize: 16, fontWeight: 600, color: '#1e293b'}}>
-            {editando ? 'Editar Tipo de Atendimento' : 'Adicionar Tipo de Atendimento'}
-          </h2>
-        </div>
-        
-        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 20}}>
-          {/* Tipo */}
-          <div>
-            <label style={labelStyle}>Tipo *</label>
-            <select 
-              value={form.tipo} 
-              onChange={e => setForm({...form, tipo: e.target.value, nome: ''})}
-              style={{...inputStyle, cursor: 'pointer'}}
-            >
-              <option value="">Selecione...</option>
-              {TIPOS.map(t => (
-                <option key={t.id} value={t.id}>{t.nome}</option>
-              ))}
-            </select>
-          </div>
-          
-          {/* Nome do Convênio */}
-          {form.tipo === 'convenio' && (
-            <div>
-              <label style={labelStyle}>Nome do Convênio *</label>
-              <input 
-                type="text"
-                value={form.nome}
-                onChange={e => setForm({...form, nome: e.target.value})}
-                placeholder="Ex: Unimed, Bradesco..."
-                style={inputStyle}
-              />
-            </div>
-          )}
-          
-          {/* Código Prestador */}
-          {form.tipo === 'convenio' && (
-            <div>
-              <label style={labelStyle}>Código Prestador</label>
-              <input 
-                type="text"
-                value={form.codigo}
-                onChange={e => setForm({...form, codigo: e.target.value})}
-                placeholder="Opcional"
-                style={inputStyle}
-              />
-            </div>
-          )}
-          
-          {/* Valores - só para não-convênio */}
-          {form.tipo && form.tipo !== 'convenio' && (
-            <>
+    <div>
+      <h3 style={h3Style}>Formas de Pagamento e Atendimento</h3>
+      <p style={pStyle}>
+        Configure os tipos de atendimento que o profissional oferece, junto com seus respectivos valores.
+      </p>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '20px' }}>
+        {(config.tipos_atendimento || []).map((atendimento, index) => (
+          <div key={index} style={itemStyle}>
+            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '15px', alignItems: 'center' }}>
+              {/* Seletor de Tipo */}
               <div>
-                <label style={labelStyle}>Valor Consulta</label>
-                <div style={{position: 'relative'}}>
-                  <span style={{position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', fontSize: 14}}>R$</span>
-                  <input 
-                    type="number"
-                    value={form.consulta}
-                    onChange={e => setForm({...form, consulta: e.target.value})}
-                    placeholder="0"
-                    style={{...inputStyle, paddingLeft: 36}}
-                  />
-                </div>
+                <label style={labelStyle}>Tipo de Atendimento</label>
+                <select
+                  value={atendimento.tipo}
+                  onChange={(e) => handleUpdateTipo(index, 'tipo', e.target.value)}
+                  style={inputStyle}
+                >
+                  {tiposDeAtendimento.map(tipo => (
+                    <option key={tipo} value={tipo}>{tipo}</option>
+                  ))}
+                </select>
               </div>
+
+              {/* Campo Procedimento */}
               <div>
-                <label style={labelStyle}>Valor 1ª Consulta</label>
-                <div style={{position: 'relative'}}>
-                  <span style={{position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', fontSize: 14}}>R$</span>
-                  <input 
-                    type="number"
-                    value={form.primeira}
-                    onChange={e => setForm({...form, primeira: e.target.value})}
-                    placeholder="0"
-                    style={{...inputStyle, paddingLeft: 36}}
-                  />
-                </div>
-              </div>
-              <div>
-                <label style={labelStyle}>Valor Retorno</label>
-                <div style={{position: 'relative'}}>
-                  <span style={{position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', fontSize: 14}}>R$</span>
-                  <input 
-                    type="number"
-                    value={form.retorno}
-                    onChange={e => setForm({...form, retorno: e.target.value})}
-                    placeholder="0"
-                    style={{...inputStyle, paddingLeft: 36}}
-                  />
-                </div>
-              </div>
-              <div>
-                <label style={labelStyle}>Valor Acompanhamento</label>
-                <div style={{position: 'relative'}}>
-                  <span style={{position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', fontSize: 14}}>R$</span>
-                  <input 
-                    type="number"
-                    value={form.acompanhamento}
-                    onChange={e => setForm({...form, acompanhamento: e.target.value})}
-                    placeholder="0"
-                    style={{...inputStyle, paddingLeft: 36}}
-                  />
-                </div>
-              </div>
-              <div>
-                <label style={labelStyle}>Retorno até (dias)</label>
-                <input 
-                  type="number"
-                  value={form.dias_retorno}
-                  onChange={e => setForm({...form, dias_retorno: e.target.value})}
-                  placeholder="Ex: 30"
+                <label style={labelStyle}>Procedimento</label>
+                <input
+                  type="text"
+                  placeholder="Ex: Consulta, Exame, etc."
+                  value={atendimento.procedimento || ''}
+                  onChange={(e) => handleUpdateTipo(index, 'procedimento', e.target.value)}
                   style={inputStyle}
                 />
               </div>
-            </>
-          )}
-        </div>
-        
-        {/* Formas de Pagamento */}
-        {form.tipo && (
-          <div style={{marginBottom: 20}}>
-            <label style={labelStyle}>Formas de Pagamento *</label>
-            <div style={{display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8}}>
-              {FORMAS.map(f => {
-                const sel = form.formas.includes(f.id);
-                return (
-                  <button 
-                    key={f.id} 
-                    onClick={() => toggleForma(f.id)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      padding: '8px 14px',
-                      background: sel ? '#1f93ff15' : 'white',
-                      border: `2px solid ${sel ? '#1f93ff' : '#e2e8f0'}`,
-                      borderRadius: 8,
-                      fontSize: 13,
-                      fontWeight: 500,
-                      color: sel ? '#1f93ff' : '#64748b',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    {f.icone} {f.nome} {sel && '✓'}
-                  </button>
-                );
-              })}
+
+              {/* Campo Valor */}
+              <div>
+                <label style={labelStyle}>Valor (R$)</label>
+                <div style={{ position: 'relative' }}>
+                  <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#718096' }}>R$</span>
+                  <input
+                    type="text"
+                    placeholder="150,00"
+                    value={formatCurrency(atendimento.valor)}
+                    onBlur={(e) => handleUpdateTipo(index, 'valor', parseCurrency(e.target.value))}
+                    onChange={(e) => handleUpdateTipo(index, 'valor', e.target.value.replace('R$ ', ''))}
+                    style={{ ...inputStyle, paddingLeft: '40px' }}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        )}
-        
-        {/* Botões */}
-        <div style={{display: 'flex', gap: 12, justifyContent: 'flex-end'}}>
-          {editando && (
-            <button 
-              onClick={resetForm}
-              style={{
-                padding: '10px 20px',
-                background: '#f1f5f9',
-                color: '#64748b',
-                border: 'none',
-                borderRadius: 8,
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: 'pointer'
-              }}
+
+            {/* Botão de Remover */}
+            <button
+              onClick={() => handleRemoveTipo(index)}
+              style={removeButtonStyle}
+              title="Remover tipo de atendimento"
             >
-              Cancelar
+              <Trash2 size={18} />
             </button>
-          )}
-          <button 
-            onClick={adicionar}
-            style={{
-              padding: '10px 24px',
-              background: editando ? '#f59e0b' : '#1f93ff',
-              color: 'white',
-              border: 'none',
-              borderRadius: 8,
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6
-            }}
-          >
-            {editando ? '💾 Salvar Alterações' : '➕ Adicionar'}
-          </button>
-        </div>
+          </div>
+        ))}
       </div>
-      
-      {/* Tabela */}
-      <div style={{background: 'white', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0'}}>
-        <div style={{padding: '16px 24px', borderBottom: '1px solid #e2e8f0', background: '#f8fafc'}}>
-          <h2 style={{fontSize: 14, fontWeight: 600, color: '#1e293b', textTransform: 'uppercase', letterSpacing: '0.5px'}}>
-            📋 Tipos de Atendimento Configurados
-          </h2>
-        </div>
-        
-        {tipos.length === 0 ? (
-          <div style={{padding: '48px 24px', textAlign: 'center'}}>
-            <div style={{fontSize: 48, marginBottom: 12}}>📭</div>
-            <p style={{color: '#94a3b8', fontSize: 14}}>Nenhum tipo de atendimento configurado</p>
-            <p style={{color: '#cbd5e1', fontSize: 13, marginTop: 4}}>Use o formulário acima para adicionar</p>
-          </div>
-        ) : (
-          <div style={{overflowX: 'auto'}}>
-            <table style={{width: '100%', borderCollapse: 'collapse'}}>
-              <thead>
-                <tr style={{background: '#f8fafc'}}>
-                  <th style={{padding: '12px 16px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: '#64748b', textTransform: 'uppercase', borderBottom: '2px solid #e2e8f0'}}>Tipo</th>
-                  <th style={{padding: '12px 16px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: '#64748b', textTransform: 'uppercase', borderBottom: '2px solid #e2e8f0'}}>Nome</th>
-                  <th style={{padding: '12px 16px', textAlign: 'center', fontSize: 12, fontWeight: 600, color: '#64748b', textTransform: 'uppercase', borderBottom: '2px solid #e2e8f0'}}>Valores</th>
-                  <th style={{padding: '12px 16px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: '#64748b', textTransform: 'uppercase', borderBottom: '2px solid #e2e8f0'}}>Pagamentos</th>
-                  <th style={{padding: '12px 16px', textAlign: 'center', fontSize: 12, fontWeight: 600, color: '#64748b', textTransform: 'uppercase', borderBottom: '2px solid #e2e8f0'}}>Status</th>
-                  <th style={{padding: '12px 16px', textAlign: 'center', fontSize: 12, fontWeight: 600, color: '#64748b', textTransform: 'uppercase', borderBottom: '2px solid #e2e8f0'}}>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tipos.map((item, idx) => (
-                  <tr key={item.id} style={{background: idx % 2 === 0 ? 'white' : '#fafafa', opacity: item.ativo ? 1 : 0.6}}>
-                    <td style={{padding: '14px 16px', borderBottom: '1px solid #f1f5f9'}}>
-                      <span style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        padding: '4px 10px',
-                        background: item.cor + '15',
-                        color: item.cor,
-                        borderRadius: 6,
-                        fontSize: 12,
-                        fontWeight: 600
-                      }}>
-                        {item.tipo === 'particular' && '💰'}
-                        {item.tipo === 'convenio' && '🏥'}
-                        {item.tipo === 'telemedicina' && '📹'}
-                        {item.tipoNome}
-                      </span>
-                    </td>
-                    <td style={{padding: '14px 16px', borderBottom: '1px solid #f1f5f9'}}>
-                      <div style={{fontWeight: 500, color: '#1e293b'}}>{item.nome}</div>
-                      {item.codigo && <div style={{fontSize: 12, color: '#94a3b8'}}>Cód: {item.codigo}</div>}
-                    </td>
-                    <td style={{padding: '14px 16px', borderBottom: '1px solid #f1f5f9', textAlign: 'center'}}>
-                      {item.tipo === 'convenio' ? (
-                        <span style={{color: '#94a3b8', fontSize: 13}}>Tabela convênio</span>
-                      ) : (
-                        <div style={{fontSize: 13}}>
-                          <div><span style={{color: '#94a3b8'}}>Consulta:</span> <strong style={{color: '#1e293b'}}>R$ {item.consulta}</strong></div>
-                          {item.primeira > 0 && <div><span style={{color: '#94a3b8'}}>1ª:</span> <strong style={{color: '#1e293b'}}>R$ {item.primeira}</strong></div>}
-                          {item.retorno > 0 && <div><span style={{color: '#94a3b8'}}>Retorno:</span> <strong style={{color: '#1e293b'}}>R$ {item.retorno}</strong></div>}
-                          {item.acompanhamento > 0 && <div><span style={{color: '#94a3b8'}}>Acomp.:</span> <strong style={{color: '#1e293b'}}>R$ {item.acompanhamento}</strong></div>}
-                          {item.dias_retorno > 0 && <div style={{marginTop: 4, fontSize: 11, color: '#64748b'}}>Retorno até {item.dias_retorno} dias</div>}
-                        </div>
-                      )}
-                    </td>
-                    <td style={{padding: '14px 16px', borderBottom: '1px solid #f1f5f9'}}>
-                      <div style={{display: 'flex', gap: 4, flexWrap: 'wrap'}}>
-                        {item.formas.map(f => {
-                          const forma = FORMAS.find(x => x.id === f);
-                          return forma ? (
-                            <span key={f} title={forma.nome} style={{
-                              padding: '4px 8px',
-                              background: '#f1f5f9',
-                              borderRadius: 4,
-                              fontSize: 12
-                            }}>
-                              {forma.icone} {forma.nome}
-                            </span>
-                          ) : null;
-                        })}
-                      </div>
-                    </td>
-                    <td style={{padding: '14px 16px', borderBottom: '1px solid #f1f5f9', textAlign: 'center'}}>
-                      <button 
-                        onClick={() => toggleAtivo(item.id)}
-                        style={{
-                          padding: '4px 12px',
-                          background: item.ativo ? '#dcfce7' : '#fee2e2',
-                          color: item.ativo ? '#16a34a' : '#dc2626',
-                          border: 'none',
-                          borderRadius: 20,
-                          fontSize: 12,
-                          fontWeight: 600,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {item.ativo ? '✓ Ativo' : '✗ Inativo'}
-                      </button>
-                    </td>
-                    <td style={{padding: '14px 16px', borderBottom: '1px solid #f1f5f9', textAlign: 'center'}}>
-                      <div style={{display: 'flex', gap: 8, justifyContent: 'center'}}>
-                        <button 
-                          onClick={() => editar(item)}
-                          style={{
-                            padding: '6px 12px',
-                            background: '#fef3c7',
-                            color: '#d97706',
-                            border: 'none',
-                            borderRadius: 6,
-                            fontSize: 12,
-                            fontWeight: 600,
-                            cursor: 'pointer'
-                          }}
-                        >
-                          ✏️ Editar
-                        </button>
-                        <button 
-                          onClick={() => remover(item.id)}
-                          style={{
-                            padding: '6px 12px',
-                            background: '#fee2e2',
-                            color: '#dc2626',
-                            border: 'none',
-                            borderRadius: 6,
-                            fontSize: 12,
-                            fontWeight: 600,
-                            cursor: 'pointer'
-                          }}
-                        >
-                          🗑️ Remover
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>     
-      
+
+      <button
+        onClick={handleAddTipo}
+        style={addButtonStyle}
+      >
+        <Plus size={16} /> Adicionar Tipo de Atendimento
+      </button>
     </div>
   );
 }
+
+// Estilos
+const h3Style = {
+  fontSize: '18px',
+  fontWeight: '600',
+  color: '#2d3748',
+  borderBottom: '1px solid #e2e8f0',
+  paddingBottom: '10px',
+  marginBottom: '10px'
+};
+
+const pStyle = {
+  fontSize: '14px',
+  color: '#718096'
+};
+
+const itemStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '15px',
+  background: '#f8fafc',
+  padding: '20px',
+  borderRadius: '12px',
+  border: '1px solid #e2e8f0'
+};
+
+const labelStyle = {
+  display: 'block',
+  fontSize: '13px',
+  fontWeight: '500',
+  color: '#4a5568',
+  marginBottom: '6px'
+};
+
+const inputStyle = {
+  width: '100%',
+  padding: '10px 12px',
+  border: '2px solid #e2e8f0',
+  borderRadius: '8px',
+  fontSize: '14px',
+  transition: 'all 0.2s',
+  background: 'white'
+};
+
+const addButtonStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  padding: '10px 20px',
+  background: '#eef2ff',
+  color: '#4338ca',
+  border: 'none',
+  borderRadius: '8px',
+  fontSize: '14px',
+  fontWeight: '600',
+  cursor: 'pointer',
+  marginTop: '20px',
+  transition: 'background 0.2s'
+};
+
+const removeButtonStyle = {
+  background: 'transparent',
+  border: 'none',
+  color: '#94a3b8',
+  cursor: 'pointer',
+  padding: '8px',
+  borderRadius: '50%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center'
+};
+
+export default AbaPagamentos;

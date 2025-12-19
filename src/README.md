@@ -93,6 +93,8 @@ curl -X POST https://api.endoclin.cloud/api/agendamentos \
     "data_consulta": "2024-12-15",
     "hora_consulta": "14:00",
     "tipo_consulta": "presencial",
+    "procedimento": "Consulta de rotina",
+    "valor": 250.00,
     "status": "pendente",
     "primeira_consulta": true
   }'

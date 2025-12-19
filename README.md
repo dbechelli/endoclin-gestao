@@ -108,6 +108,8 @@ CREATE TABLE agendamentos (
   data_consulta DATE NOT NULL,
   hora_consulta TIME NOT NULL,
   tipo_consulta TEXT,
+  procedimento TEXT,
+  valor NUMERIC(10, 2),
   primeira_consulta BOOLEAN DEFAULT false,
   status TEXT DEFAULT 'pendente',
   observacoes TEXT,

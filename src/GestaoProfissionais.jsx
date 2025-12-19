@@ -148,14 +148,7 @@ function GestaoProfissionais() {
           nao_atende: [],
           condicoes_especiais: []
         },
-        formas_atendimento: {
-          aceita_particular: false,
-          valor_consulta_particular: 0,
-          valor_primeira_consulta: 0,
-          aceita_convenios: false,
-          convenios_atendidos: [],
-          aceita_online: false
-        },
+        tipos_atendimento: [],
         perfil_ia: {
           bio: '',
           formacao: [],
